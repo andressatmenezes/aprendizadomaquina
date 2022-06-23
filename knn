@@ -1,0 +1,55 @@
+library(tidyverse)
+
+dados = tibble( x_1 = rnorm(100,1,1),
+                x_2 = rnorm(100,-1,2),
+                y = factor(sample(c("one","two","three"),100,replace = T)))
+x = c(0.17322548, -0.95279179)
+classx= "two"
+
+knn = function(k,x,dados){
+
+  #Setando as variáveis utilizadas
+  v<- NULL
+  i=1
+    
+  #Cria o vetor v, que contém os k elementos mais próximos de x
+  while (i<=k){
+    example <- (dados[i,1:length(dados)-1])
+    euclidean <- sqrt(sum((example - x)^2))
+    v <- c(v,euclidean)
+    i=i+1
+  }
+  
+  #Cria o vetor knn, que contém o índice da linha de cada elemento
+  #mais próximo determinado por v
+  knn <- order(v)
+  
+  #Cria um vetor somente com as classes
+  class= NULL
+  for (j in knn){
+    
+    class <- c(class,dados[j,length(dados)])
+  }
+  
+  #Verifica a classe através de contadores
+  class1=0
+  class2=0
+  q=1
+  while(q <= k){
+    if(identical(class[q], x[length(dados)])){
+      class1=class1+1
+    }
+    else {
+      class2= class2+1
+    }
+    q=q+1
+  }
+  
+  if(class1 >= class2){
+    return("one")
+  }
+  if(class1 <= class2){
+    return("two")
+  }
+}
+print(knn(k,x,dados))
