@@ -1,20 +1,22 @@
 library(tidyverse)
 
-dados = tibble( x_1 = rnorm(100,1,1),
+
+D = tibble( x_1 = rnorm(100,1,1),
                 x_2 = rnorm(100,-1,2),
                 y = factor(sample(c("one","two","three"),100,replace = T)))
-x = c(0.17322548, -0.95279179)
-classx= "two"
+#test inputs
+x = c(1.26007151, -3.33251570) #one
+k=7
+print(knn_algorithm(k,x,D))
 
-knn = function(k,x,dados){
-
+knn_algorithm = function(k,x,D){
   #Setando as variáveis utilizadas
   v<- NULL
   i=1
-    
+  
   #Cria o vetor v, que contém os k elementos mais próximos de x
   while (i<=k){
-    example <- (dados[i,1:length(dados)-1])
+    example <- (D[i,1:length(D)-1])
     euclidean <- sqrt(sum((example - x)^2))
     v <- c(v,euclidean)
     i=i+1
@@ -25,31 +27,47 @@ knn = function(k,x,dados){
   knn <- order(v)
   
   #Cria um vetor somente com as classes
-  class= NULL
+  class <- NULL
+  j=1
   for (j in knn){
     
-    class <- c(class,dados[j,length(dados)])
+    class <- c(class,D[j,length(D)])
   }
+  class <- unlist(class)
   
   #Verifica a classe através de contadores
   class1=0
   class2=0
+  class3=0
   q=1
   while(q <= k){
-    if(identical(class[q], x[length(dados)])){
+    if(class[q]=="one"){
       class1=class1+1
+      #print(q)
+      #print("one")
     }
-    else {
+    if(class[q]=="two") {
       class2= class2+1
+      #print(q)
+      #print("two")
+    }
+    if(class[q]=="three"){
+      class3= class3+1
+      #print(q)
+      #print("three")
     }
     q=q+1
   }
   
-  if(class1 >= class2){
+  #Comparação entre os contadores para definir a classe
+  if(class1 > class2 && class1 > class3){
     return("one")
   }
-  if(class1 <= class2){
+  if(class2 > class1 && class2 > class3){
     return("two")
   }
+  if(class3 > class1 && class3 > class2){
+    return("three")
+  }
 }
-print(knn(k,x,dados))
+
